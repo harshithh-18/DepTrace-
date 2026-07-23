@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: lint · types · tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --locked --all-extras --dev
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Type check
+        run: uv run mypy src
+
+      # The suite blocks outbound sockets in conftest.py, so this step needs
+      # no API keys, no Ollama, and no network egress. If a test ever reaches
+      # the internet it fails loudly rather than becoming silently flaky.
+      - name: Test
+        run: uv run pytest -q
+
+  smoke:
+    name: keyless clean-clone smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      # The headline property: a fresh clone scans a project with no accounts,
+      # no API keys, and no services running. --no-llm keeps this hermetic;
+      # it exercises manifests, OSV lookup, and reporting end to end.
+      - name: Scan this repo with no API keys
+        run: uv run deptrace scan . --no-llm --no-save --fail-on never
+
+      - name: Machine-readable output is valid
+        run: |
+          uv run deptrace scan . --no-llm --no-save --fail-on never -f json > scan.json
+          uv run python -c "import json; d=json.load(open('scan.json')); print('findings:', len(d['findings']))"
+          uv run deptrace scan . --no-llm --no-save --fail-on never -f sarif > scan.sarif
+          uv run python -c "import json; d=json.load(open('scan.sarif')); assert d['version']=='2.1.0'"
+
+      - name: Upload SARIF
+        uses: actions/upload-artifact@v4
+        with:
+          name: deptrace-sarif
+          path: scan.sarif

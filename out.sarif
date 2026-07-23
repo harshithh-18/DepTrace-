@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "DepTrace",
+          "informationUri": "https://github.com/harshithh-18/DepTrace",
+          "rules": [
+            {
+              "id": "GHSA-w8v5-vhqr-4h9v",
+              "shortDescription": {
+                "text": "DiskCache has unsafe pickle deserialization"
+              },
+              "fullDescription": {
+                "text": "DiskCache (python-diskcache) through 5.6.3 uses Python pickle for serialization by default. An attacker with write access to the cache directory can achieve arbitrary code execution when a victim application reads from the cache."
+              },
+              "helpUri": "https://nvd.nist.gov/vuln/detail/CVE-2025-69872",
+              "properties": {
+                "security-severity": "5.0",
+                "tags": [
+                  "security",
+                  "dependency"
+                ]
+              }
+            },
+            {
+              "id": "PYSEC-2026-2447",
+              "shortDescription": {
+                "text": "DiskCache has unsafe pickle deserialization"
+              },
+              "fullDescription": {
+                "text": "DiskCache (python-diskcache) through 5.6.3 uses Python pickle for serialization by default. An attacker with write access to the cache directory can achieve arbitrary code execution when a victim application reads from the cache."
+              },
+              "helpUri": "https://nvd.nist.gov/vuln/detail/CVE-2025-69872",
+              "properties": {
+                "security-severity": "5.0",
+                "tags": [
+                  "security",
+                  "dependency"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "GHSA-w8v5-vhqr-4h9v",
+          "level": "warning",
+          "message": {
+            "text": "diskcache 5.6.3: DiskCache has unsafe pickle deserialization. The advisory does not identify a specific vulnerable symbol, so reachability cannot be determined statically."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "uv.lock"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "verdict": "needs_review",
+            "downgraded": false
+          }
+        },
+        {
+          "ruleId": "PYSEC-2026-2447",
+          "level": "warning",
+          "message": {
+            "text": "diskcache 5.6.3: DiskCache has unsafe pickle deserialization. The advisory does not identify a specific vulnerable symbol, so reachability cannot be determined statically."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "uv.lock"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "verdict": "needs_review",
+            "downgraded": false
+          }
+        }
+      ]
+    }
+  ]
+}
