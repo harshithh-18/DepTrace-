@@ -42,6 +42,13 @@ jobs:
       - name: Test
         run: uv run pytest -q
 
+      # The eval is a regression gate, not a report. It runs against the
+      # labeled dataset with scripted extractions, so it needs no model and
+      # no network. Recall defaults to 1.0: a single missed reachable CVE
+      # fails the build, because that failure looks exactly like a clean scan.
+      - name: Eval regression gate
+        run: uv run python evals/run_eval.py
+
   smoke:
     name: keyless clean-clone smoke test
     runs-on: ubuntu-latest

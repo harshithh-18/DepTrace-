@@ -8,3 +8,14 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Tool caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# DepTrace scan artifacts — reports and local state are generated, not source
+*.sarif
+scan.json
+scans.db
+.cache/
